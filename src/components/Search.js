@@ -21,9 +21,7 @@ export const Search = () => {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    const timerId = setTimeout(() => {
-      setRollingTerm(term);
-    }, 250);
+    const timerId = setTimeout(() => setRollingTerm(term), 500);
     return () => {
       clearTimeout(timerId);
     };
@@ -35,14 +33,14 @@ export const Search = () => {
         (email) => rollingTerm && email.toLowerCase().includes(rollingTerm)
       )
     );
-  }, [rollingTerm,emails]);
+  }, [emails]);
 
   useEffect(() => {
     async function fetchData() {
-      setEmails(await contactsService.getEmailsList());
+      setEmails(await contactsService.getEmailsList(rollingTerm));
     }
-    fetchData()
-  }, []);
+    fetchData();
+  }, [rollingTerm]);
 
   return (
     <Box
@@ -58,17 +56,12 @@ export const Search = () => {
         label="Email List"
         variant="outlined"
         onChange={(e) => setTerm(e.target.value)}
-        onClick={() =>
-          results.length > 0 && !term
-            ? setResults([])
-            : results.length > 0 && term
-            ? null
-            : setResults(emails)
-        }
       />
       <ul style={ulStyle}>
         {results.map((result) => (
-          <li style={liStyle}>{result}</li>
+          <li style={liStyle} key={result}>
+            {result}
+          </li>
         ))}
       </ul>
     </Box>
